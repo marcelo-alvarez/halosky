@@ -1,10 +1,10 @@
 from setuptools import setup
 
-setup(name='ranmap',
+setup(name='halosky',
       version='0.1',
       description='Random SZ maps',
-      url='http://github.com/marcelo-alvarez/ranmap',
+      url='http://github.com/marcelo-alvarez/halosky',
       author='Marcelo Alvarez',
       license='MIT',
-      packages=['ranmap'],
+      packages=['halosky'],
       zip_safe=False)

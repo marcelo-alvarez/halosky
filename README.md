@@ -1,2 +1,2 @@
-# ranmap
-Create random SZ maps from random halo catalogs
+# halosky
+Creating halo based maps of the sky
