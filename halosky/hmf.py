@@ -11,18 +11,20 @@ from astropy import units as u
 
 import sys
 import os
+from os import path
 
 h      = 0.68
 omegab = 0.049
 omegam = 0.31
-omegal = 1-omegam
 sigma8 = 0.81
 ns     = 0.965
+
+omegal = 1-omegam
 
 rho_mean    = 2.775e11 * omegam * h**2
 
 # load in power spectrum used for websky
-pkfile   = ('./planck2018_powerspectrum.dat')
+pkfile   = ('./data/planck2018_powerspectrum.dat')
 pk_data = np.loadtxt(pkfile)
 k       = pk_data[:,0]
 pk      = pk_data[:,1]*(2*np.pi)**3
@@ -168,38 +170,52 @@ def dndmofm_tinker(Mmin, Mmax, redshift):
 
     return M,dndm,dndmofm
 
-def dndmofmz_tinker(mmin,mmax,zmin,zmax):
+class hmf:
+    '''Halo mass function'''
 
-    from os import path
-    if not path.exists('dndmtab.npz'):
+    def __init__(self, **kwargs):
 
-        print("\n creating table")
-        dlogm = 0.05
-        dz    = 0.1
+        self.mmin = kwargs.get('mmin',1e13)
+        self.mmax = kwargs.get('mmin',1e16)
+        self.zmin = kwargs.get('zmin',0.0)
+        self.zmax = kwargs.get('zmax',4.5)
 
-        nm = int((np.log10(mmax)-np.log10(mmin))/dlogm)+1
-        nz = int((zmax-zmin)/dz)+1
+        mmin = self.mmin
+        mmax = self.mmax
+        zmin = self.zmin
+        zmax = self.zmax
 
-        m = np.logspace(np.log10(mmin),np.log10(mmax),nm)
-        z = np.linspace(zmin,zmax,nz)
+        if not path.exists('dndmtab.npz'):
 
-        dndmofmz = np.zeros((nz,nm))
+            print("\n creating table")
+            dlogm = 0.05
+            dz    = 0.1
 
-        iz=0
-        for zv in z:
-            print(" z: ","{:4.2f}".format(zv),
+            nm = int((np.log10(mmax)-np.log10(mmin))/dlogm)+1
+            nz = int((zmax-zmin)/dz)+1
+
+            m = np.logspace(np.log10(mmin),np.log10(mmax),nm)
+            z = np.linspace(zmin,zmax,nz)
+
+            dndmofmz = np.zeros((nz,nm))
+
+            iz=0
+            for zv in z:
+                print(" z: ","{:4.2f}".format(zv),
                   end="\r", flush=True)
-            m_t,dndm_t, f = dndmofm_tinker(mmin,mmax,zv) # M, dndM in Msun, 1/Mpc^3/Msun
-            dndmofmz[iz,:] = np.log10(f(m))
-            iz += 1
-        np.savez('dndmtab.npz',m=m,z=z,dndmofmz=dndmofmz)
-    else:
-        data = np.load('dndmtab.npz')
-        m = data['m']
-        z = data['z']
-        dndmofmz = data['dndmofmz']
+                m_t,dndm_t, f = dndmofm_tinker(mmin,mmax,zv) # M, dndM in Msun, 1/Mpc^3/Msun
+                dndmofmz[iz,:] = np.log10(f(m))
+                iz += 1
+            np.savez('dndmtab.npz',m=m,z=z,dndmofmz=dndmofmz)
 
-    dndmofmzfunc_log = interp2d(np.log10(m),z,dndmofmz)
-    dndmofmzfunc     = lambda m,z: 10**dndmofmzfunc_log(np.log10(m),z)
+        else:
 
-    return dndmofmzfunc
+            data = np.load('dndmtab.npz')
+            m = data['m']
+            z = data['z']
+            dndmofmz = data['dndmofmz']
+
+        dndmofmzfunc_log = interp2d(np.log10(m),z,dndmofmz)
+        dndmofmzfunc     = lambda m,z: 10**dndmofmzfunc_log(np.log10(m),z)
+
+        self.dndmofmz = dndmofmzfunc

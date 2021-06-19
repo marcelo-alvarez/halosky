@@ -1,25 +1,53 @@
-import rancat.lightcone as rclc
-import rancat.hmf_websky as hmfw
+import halosky as hs
 import numpy as np
 import matplotlib.pyplot as plt
 
-fsky=1.0
-dz=0.1
-zmin=0
-zmax=4.5
-mmin=1e13
-mmax=1e16
+def examinecat(catfile):
+    f=open(catfile)
+    N=np.fromfile(f,count=3,dtype=np.int32)[0]
 
-# create function dndm(M,z) with input mass in Msun, and return units 1/Mpc^3/Msun
-# here we use Tinker et al. (2008) with Websky cosmology
+    # only take first five entries for testing (there are ~8e8 halos total...)
+    # comment the following line to read in all halos
+    #N = 5
 
-dndmofmz = hmfw.dndmofmz_tinker(mmin,mmax,zmin,zmax)
+    print('reading halos...')
+    catalog=np.fromfile(f,count=N*10,dtype=np.float32)
+    print('reshaping ...')
+    catalog=np.reshape(catalog,(N,10))
+
+    x  = catalog[:,0];  y = catalog[:,1];  z  = catalog[:,2] # Mpc (comoving)
+    R  = catalog[:,6] # Mpc
+
+# create cosmology
+cosmo = hs.cosmology.cosmology(
+    omegab = 0.049,
+    omegac = 0.261,
+    h      = 0.68,
+    ns     = 0.965,
+    sigma8 = 0.81
+)
+
+# create hmf object
+hmf = hs.hmf.hmf(cosmo=cosmo)
 
 # create lightcone object
-lc = rclc.lightcone(fsky=fsky,zmin=zmin,zmax=zmax,dz=dz,Mmin=mmin,Mmax=mmax)
+lc = hs.lightcone.lightcone(cosmo=cosmo,fsky=1.0,Mmin=5e14)
 
-# sample halos from the halo mass function in the lightcone
-lc.populate(dndmofmz)
+#create halopaint object
+hp = hs.halopaint.halopaint(nside=1024)
 
-# write halos in pksc halo format used in Websky
-lc.write_pksc('rancat_test.pksc')
+Nran = 10
+for i in range(Nran):
+    # sample halos from the halo mass function in the lightcone
+    lc.populate(hmf.dndmofmz)
+
+    # write halos in pksc halo format used in Websky
+    catfile = './catalogs/cat_'+f'{i:05d}'+'.pksc'
+    lc.write_pksc(catfile=catfile)
+
+    # make map
+    mapname = './maps/tsz_'+f'{i:05d}'
+    hp.makemap(catfile=catfile,mapname=mapname,n=1,N=1)
+
+    # clear halos from Lightcone
+    lc.clear()

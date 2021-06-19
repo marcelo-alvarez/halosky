@@ -2,7 +2,7 @@ import numpy as np
 from numpy.random import *
 from scipy.optimize import root_scalar
 from scipy.interpolate import interp1d
-import rancat.cosmology as co
+from . import cosmology as co
 import matplotlib.pyplot as plt
 
 def fsky2fov_root(fov,fsky):
@@ -15,15 +15,15 @@ class lightcone:
     '''Lightcone'''
     def __init__(self, **kwargs):
 
-        self.Nobj = kwargs.get('Nobj',0)
+        self.cosmo   = kwargs.get('cosmo',co.cosmology())
 
         self.zmin = kwargs.get('zmin',0.0)
         self.zmax = kwargs.get('zmax',5.0)
-        self.Mmin = kwargs.get('Mmin',1e12)
-        self.Mmax = kwargs.get('Mmax',1e17)
-        self.fsky = kwargs.get('fsky',1.0)
+        self.Mmin = kwargs.get('Mmin',1e13)
+        self.Mmax = kwargs.get('Mmax',1e16)
+        self.fsky = kwargs.get('fsky',0.01)
 
-        self.dz   = kwargs.get('dz', 0.01)
+        self.dz   = kwargs.get('dz', 0.1)
 
         if(self.fsky < 1.0):
             if(self.fsky > 0.5):
@@ -44,12 +44,19 @@ class lightcone:
             self.theta0 = 0.0
             self.theta1 = np.pi
 
-        self.M = np.zeros(self.Nobj)
-        self.x = np.zeros(self.Nobj)
-        self.y = np.zeros(self.Nobj)
-        self.z = np.zeros(self.Nobj)
+        self.clear()
+
+    def clear(self):
+
+        self.Nobj = 0
+        self.M    = np.zeros(self.Nobj)
+        self.x    = np.zeros(self.Nobj)
+        self.y    = np.zeros(self.Nobj)
+        self.z    = np.zeros(self.Nobj)
 
     def _getngtm(self,z,z0,z1,dndmfunc):
+
+        co = self.cosmo
 
         Narr = 10000
 
@@ -82,6 +89,8 @@ class lightcone:
         zmax = self.zmax
         dz   = self.dz
         fsky = self.fsky
+        co   = self.cosmo
+
         mu0  = np.cos(self.theta0)
         mu1  = np.cos(self.theta1)
         phi0 = self.phi0
@@ -106,19 +115,22 @@ class lightcone:
 
             # total number of halos in shell
             N = poisson(Nbar)
+
+            if(N==0): return
+
             self.Nobj += N
 
             # mass of each halo sampled from distribution
             fN = uniform(size=N)
             M  = ngtmfunci(Nbar*fN)
 
-            print("   z, N, Mmin, Mmax: ","{:4.2f}".format(z),"{:9d}".format(N),"{:9d}".format(self.Nobj),
+            print("   z, Nshell, Ntot, Mmin, Mmax: ","{:4.2f}".format(z),"{:9d}".format(N),"{:9d}".format(self.Nobj),
                   "{:e}".format(M.min()),"{:e}".format(M.max()), end="\r", flush=True)
 
             # distance sampled in volume
             fV    = uniform(size=N)
-            chi03 = co.chiofz(z0)
-            chi13 = co.chiofz(z1)
+            chi03 = co.chiofz(z0)**3
+            chi13 = co.chiofz(z1)**3
             dchi3 = chi13 - chi03
             chi   = (chi03 + dchi3*fV)**(1./3.)
 
@@ -141,12 +153,19 @@ class lightcone:
 
         return
 
-    def write_pksc(self,filename):
+    def write_pksc(self,**kwargs):
+
+        import pathlib
+        import os
+
+        catfile = kwargs.get('catfile','halos.pksc')
 
         M = self.M
         x = self.x
         y = self.y
         z = self.z
+
+        co = self.cosmo
 
         Nobj = self.Nobj
 
@@ -154,20 +173,25 @@ class lightcone:
         R = ((3.*M/4./np.pi/rho)**(1./3.)).astype(np.float32)
 
         header = np.asarray([self.Nobj, 0, 0]).astype(np.int32)
-        f = open(filename,'wb')
+
+        path   = pathlib.Path(catfile).resolve()
+        parent = path.parent
+        parent.mkdir(parents=True, exist_ok=True)
+
+        f = open(catfile,'wb')
         header.tofile(f)
 
         chunksize = 10000000
         end = 0
         remain = True
-        print("\n writing",Nobj,"halos")
+        print("\n writing",Nobj,"halos to file",os.path.basename(path))
         while remain:
             start = end
             end   = start + chunksize
             if end > Nobj:
                 remain = False
                 end = Nobj
-            print("  ", start, end, end="\r", flush=True)
+            print("   start_index, end_index: ", start, end, end="\r", flush=True)
             outdata = np.column_stack((x[start:end],y[start:end],z[start:end],
                                        x[start:end],y[start:end],z[start:end],
                                        R[start:end],
