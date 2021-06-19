@@ -18,7 +18,6 @@ omegab = 0.049
 omegam = 0.31
 sigma8 = 0.81
 ns     = 0.965
-
 omegal = 1-omegam
 
 rho_mean    = 2.775e11 * omegam * h**2

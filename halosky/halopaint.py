@@ -25,7 +25,7 @@ class halopaint:
     def makemap(self,**kwargs):
 
         import os
-        
+
         catfile = kwargs.get('catfile','halos.pksc')
         mapname = kwargs.get('mapname','tsz')
 
@@ -44,7 +44,6 @@ class halopaint:
 
         exe     = self.exe
         tabfile = self.tabfile
-
         nside = self.nside
 
         tmpname='tsz'

@@ -14,7 +14,6 @@ class cosmology:
         self.sigma8 = 0.81
 
         self.c = 3e5
-
         self.H0 = 100 * self.h
 
         c  = self.c

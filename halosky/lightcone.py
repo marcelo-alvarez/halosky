@@ -16,7 +16,6 @@ class lightcone:
     def __init__(self, **kwargs):
 
         self.cosmo   = kwargs.get('cosmo',co.cosmology())
-
         self.zmin = kwargs.get('zmin',0.0)
         self.zmax = kwargs.get('zmax',5.0)
         self.Mmin = kwargs.get('Mmin',1e13)
