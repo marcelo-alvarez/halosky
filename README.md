@@ -7,7 +7,7 @@ Creating halo based maps of the sky
 3. pip install .
 
 ## Running
-Example included here in [scripts/example.py](https://github.com/marcelo-alvarez/halosky/blob/master/scripts/example.py):
+Currently only runs on cori without modification. Needs to be run in a parallel environment. Example included here in [scripts/example.py](https://github.com/marcelo-alvarez/halosky/blob/master/scripts/example.py):
 ```
 import halosky as hs
 import numpy as np
@@ -42,7 +42,7 @@ for i in range(Nran):
 
     # make map
     mapname = './maps/tsz_'+f'{i:05d}'
-    hp.makemap(catfile=catfile,mapname=mapname,n=1,N=1)
+    hp.makemap(catfile=catfile,mapname=mapname,nproc=16,nodes=1)
 
     # clear halos from Lightcone
     lc.clear()
