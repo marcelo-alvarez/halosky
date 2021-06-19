@@ -8,6 +8,7 @@ Creating halo based maps of the sky
 
 ## Running
 Example included here in scripts/example.py:
+```
 import halosky as hs
 import numpy as np
 import matplotlib.pyplot as plt
@@ -45,3 +46,4 @@ for i in range(Nran):
 
     # clear halos from Lightcone
     lc.clear()
+```
