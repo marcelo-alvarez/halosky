@@ -7,7 +7,7 @@ Creating halo based maps of the sky
 3. pip install .
 
 ## Running
-Example included here in scripts/example.py:
+Example included here in [scripts/example.py](https://github.com/marcelo-alvarez/halosky/blob/master/scripts/example.py):
 ```
 import halosky as hs
 import numpy as np
