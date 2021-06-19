@@ -12,7 +12,7 @@ from astropy import units as u
 import sys
 import os
 from os import path
-
+import pkg_resources
 h      = 0.68
 omegab = 0.049
 omegam = 0.31
@@ -23,7 +23,8 @@ omegal = 1-omegam
 rho_mean    = 2.775e11 * omegam * h**2
 
 # load in power spectrum used for websky
-pkfile   = ('./data/planck2018_powerspectrum.dat')
+pkfile = pkg_resources.resource_filename('halosky', 'data/planck2018_powerspectrum.dat')
+#pkfile   = ('./data/planck2018_powerspectrum.dat')
 pk_data = np.loadtxt(pkfile)
 k       = pk_data[:,0]
 pk      = pk_data[:,1]*(2*np.pi)**3
