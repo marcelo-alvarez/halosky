@@ -47,7 +47,7 @@ for i in range(Nran):
 
     # make map
     mapname = './maps/tsz_'+f'{i:05d}'
-    hp.makemap(catfile=catfile,mapname=mapname,n=1,N=1)
+    hp.makemap(catfile=catfile,mapname=mapname,nproc=16,nodes=1)
 
     # clear halos from Lightcone
     lc.clear()

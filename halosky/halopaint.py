@@ -31,8 +31,8 @@ class halopaint:
 
         mkdir(mapname)
 
-        n        = kwargs.get('n',          64)
-        N        = kwargs.get('N',           4)
+        n        = kwargs.get('nproc',      64)
+        N        = kwargs.get('nodes',       4)
         npix     = kwargs.get('npix',     1024)
         npixc    = kwargs.get('npixc',    4096)
         fov      = kwargs.get('fov',         3) # field of view of map in degrees
