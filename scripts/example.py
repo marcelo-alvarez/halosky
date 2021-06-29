@@ -1,22 +1,6 @@
 import halosky as hs
 import numpy as np
 
-def examinecat(catfile):
-    f=open(catfile)
-    N=np.fromfile(f,count=3,dtype=np.int32)[0]
-
-    # only take first five entries for testing (there are ~8e8 halos total...)
-    # comment the following line to read in all halos
-    #N = 5
-
-    print('reading halos...')
-    catalog=np.fromfile(f,count=N*10,dtype=np.float32)
-    print('reshaping ...')
-    catalog=np.reshape(catalog,(N,10))
-
-    x  = catalog[:,0];  y = catalog[:,1];  z  = catalog[:,2] # Mpc (comoving)
-    R  = catalog[:,6] # Mpc
-
 # create cosmology
 cosmo = hs.cosmology.cosmology(
     omegab = 0.049,
