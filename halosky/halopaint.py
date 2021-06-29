@@ -22,6 +22,31 @@ class halopaint:
         self.exe     = self.binpath   + '/' + 'pks2map'
         self.tabfile = self.tablepath + '/' + 'proftab_deltac_planck.bin'
 
+    def loadcutout(self,filename):
+        import array
+        import math
+        import numpy
+        import sys
+
+        mapfile = open(filename,"rb")
+
+        n=array.array('i')
+        fov=array.array('f')
+        vals=array.array('f')
+        
+        n.fromfile(mapfile,2)
+        fov.fromfile(mapfile,2)
+        
+        print('dimensions of map are:  ',n[0],'x',n[1])
+        print('field of view is:       ',fov[0]/2./math.pi*360.,'x',
+              fov[1]/2./math.pi*360.,' degrees')
+
+        vals.fromfile(mapfile,n[0]*n[1])
+
+        vals=numpy.reshape(vals,(n[0],n[1]))
+
+        return vals
+
     def makemap(self,**kwargs):
 
         import os
@@ -51,7 +76,13 @@ class halopaint:
                  catfile,tmpname,tabfile,'tsz',str(zmin),str(zmax),str(mmin),str(nside),
                      '1',str(scramble),str(npix),str(fov),'0',str(npixc),str(virflag)]
         fitsfile=tmpname+'_hp.fits'
-        outfile=mapname+'.fits'
+        mapfile=tmpname+'_fs.map'
+        dpfile=tmpname+'_dp.bin'
+        carfile=tmpname+'_car.map'
+        
+        outfile_hp=mapname+'.fits'
+        outfile_fs=mapname+'.map'
+        
         logname=mapname+'.log'
 
         logfile = open(logname,'w')
@@ -59,5 +90,8 @@ class halopaint:
         print(' making map from catalog...')
         subprocess.run(['rm','-f',fitsfile]) # cfitsio does not like overwriting fits files
         subprocess.run(runargs,stdout=logfile)
-        subprocess.run(['mv',fitsfile,outfile])
-        print(' map written to ',os.path.basename(outfile))
+        subprocess.run(['mv',fitsfile,outfile_hp])
+        subprocess.run(['mv',mapfile,outfile_fs])
+        subprocess.run(['rm','-f',dpfile,carfile]) # remove unused files
+        print(' maps written to ',os.path.basename(outfile_hp),' and ',
+              os.path.basename(outfile_fs))
