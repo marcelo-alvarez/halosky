@@ -179,13 +179,15 @@ class hmf:
         self.mmax = kwargs.get('mmin',1e16)
         self.zmin = kwargs.get('zmin',0.0)
         self.zmax = kwargs.get('zmax',4.5)
+        self.newt = kwargs.get('newtable',False)
 
         mmin = self.mmin
         mmax = self.mmax
         zmin = self.zmin
         zmax = self.zmax
+        newt = self.newt
 
-        if not path.exists('dndmtab.npz'):
+        if not path.exists('dndmtab.npz') or newt:
 
             print("\n creating table")
             dlogm = 0.05

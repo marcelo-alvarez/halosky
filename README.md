@@ -21,8 +21,8 @@ cosmo = hs.cosmology.cosmology(
     sigma8 = 0.81
 )
 
-# create hmf object
-hmf = hs.hmf.hmf(cosmo=cosmo)
+# create hmf object (the cosmology for hmf is hardcode currently)
+hmf = hs.hmf.hmf()
 
 # create lightcone object
 lc = hs.lightcone.lightcone(cosmo=cosmo,fsky=1.0,Mmin=5e14)
