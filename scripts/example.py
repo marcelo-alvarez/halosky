@@ -10,7 +10,7 @@ cosmo = hs.cosmology.cosmology(
     sigma8 = 0.81
 )
 
-# create hmf object (the cosmology for hmf is hardcode currently)
+# create hmf object (the cosmology for hmf is hardcoded currently)
 hmf = hs.hmf.hmf()
 
 # create lightcone object
