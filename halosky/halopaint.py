@@ -16,8 +16,8 @@ class halopaint:
 
         self.nside = kwargs.get('nside', 4096)
 
-        self.tablepath = kwargs.get('tablepath','/global/cfs/cdirs/mp107/exgal/software/halopaint-f/tables')
-        self.binpath   = kwargs.get('binbath',  '/global/cfs/cdirs/mp107/exgal/software/halopaint-f/bin')
+        self.tablepath = kwargs.get('tablepath','/global/homes/m/malvarez/halopaint-f/tables')
+        self.binpath   = kwargs.get('binbath',  '/global/homes/m/malvarez/halopaint-f/bin')
 
         self.exe     = self.binpath   + '/' + 'pks2map'
         self.tabfile = self.tablepath + '/' + 'proftab_deltac_planck.bin'
