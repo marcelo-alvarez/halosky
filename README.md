@@ -7,7 +7,9 @@ Creating halo based maps of the sky
 3. pip install .
 
 ## Running
-Currently only runs on cori without modification, where halosky.halopaint.makemap needs to be run in a parallel environment. Example included here in [scripts/example.py](https://github.com/marcelo-alvarez/halosky/blob/master/scripts/example.py) will produce 10 random tSZ maps and halo catalogs in the ./maps and ./catalogs directories.
+Currently only runs on perlmutter without modification, where halosky.halopaint.makemap can be run on a login node (for development only, pass "parallel=False" as an argument to makemap; production runs should be on nodes requested through Slurm).
+
+Example included here in [scripts/example.py](https://github.com/marcelo-alvarez/halosky/blob/master/scripts/example.py) will produce 10 random tSZ maps and halo catalogs in the ./maps and ./catalogs directories.
 ```
 import halosky as hs
 import numpy as np
