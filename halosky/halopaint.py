@@ -16,11 +16,11 @@ class halopaint:
 
         self.nside = kwargs.get('nside', 4096)
 
-        self.tablepath = kwargs.get('tablepath','/global/homes/m/malvarez/halopaint-f/tables')
-        self.binpath   = kwargs.get('binbath',  '/global/homes/m/malvarez/halopaint-f/bin')
+        self.tablepath = kwargs.get('tablepath','/global/cfs/cdirs/mp107/exgal/users/malvarez/halopaint-f/tables')
+        self.binpath   = kwargs.get('binbath',  '/global/cfs/cdirs/mp107/exgal/users/malvarez/halopaint-f/bin')
 
         self.exe     = self.binpath   + '/' + 'pks2map'
-        self.tabfile = self.tablepath + '/' + 'proftab_deltac_planck.bin'
+        self.tabfile = self.tablepath + '/' + 'proftab_websky.bin'
 
     def loadcutout(self,filename):
         import array
@@ -66,15 +66,19 @@ class halopaint:
         mmin     = kwargs.get('mmin',     1e12)
         scramble = kwargs.get('scramble',    0)
         virflag  = kwargs.get('virflag',     2)
+        parallel = kwargs.get('parallel', True)
 
         exe     = self.exe
         tabfile = self.tabfile
         nside = self.nside
 
         tmpname='tsz'
-        runargs=['srun','-n',str(n),'-N',str(N),exe,
-                 catfile,tmpname,tabfile,'tsz',str(zmin),str(zmax),str(mmin),str(nside),
-                     '1',str(scramble),str(npix),str(fov),'0',str(npixc),str(virflag)]
+        runargs=[exe,catfile,tmpname,tabfile,'tsz',str(zmin),str(zmax),str(mmin),
+                 str(nside),'1',str(scramble),str(npix),str(fov),'0',str(npixc),
+                 str(virflag)]
+        if parallel:
+            runargs = ['srun','-n',str(n),'-N',str(N)] + runargs
+        print(runargs)
         fitsfile=tmpname+'_hp.fits'
         mapfile=tmpname+'_fs.map'
         dpfile=tmpname+'_dp.bin'
